@@ -1,0 +1,34 @@
+---
+title: "Plastic Waste 2023 analisis"
+output: html_notebook
+---
+
+```{r}
+plastic <- read.csv("plastic.csv", stringsAsFactors = TRUE)
+```
+
+```{r}
+library(ggplot2)
+library(plotly)
+```
+
+```{r}
+pointsmtkg <- ggplot(plastic, aes(x=Total_Plastic_Waste_MT, y=Per_Capita_Waste_KG,alpha = 0.5, fill = Country)) +
+  geom_point() +
+  theme(legend.position = "none")
+```
+
+```{r fig.height=100, fig.width=100}
+ggplotly(pointsmtkg)
+```
+
+```{r}
+boxplotmtkg <- ggplot(plastic, aes(x=Total_Plastic_Waste_MT, y=Per_Capita_Waste_KG, fill = Country)) +
+  geom_boxplot() +
+  theme(legend.position = "none")
+
+```
+
+```{r}
+ggplotly(boxplotmtkg)
+```
