@@ -11,6 +11,40 @@ plastic <- read.csv("plastic.csv", stringsAsFactors = TRUE)
 library(ggplot2)
 library(plotly)
 ```
+```{r}
+model <- lm(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG + Recycling_Rate + 
+            Coastal_Waste_Risk + Main_Sources, data = plastic)
+```
+```{r}
+summary(model)
+```
+
+```{r}
+library(car)
+```
+```{r}
+Anova(model,type = "III")
+```
+
+```{r}
+shapiro.test(residuals(model))
+```
+
+```{r, fig.height=6, fig.width=7}
+par(mfrow = c(2,2))
+plot(model)
+```
+```{r}
+model_interaction <- lm(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG * 
+                       Recycling_Rate 
+                       * Main_Sources, 
+                       data = plastic)
+```
+```{r}
+summary(model_interaction)
+```
+
+
 
 ```{r}
 pointsmtkg <- ggplot(plastic, aes(x=Total_Plastic_Waste_MT, y=Per_Capita_Waste_KG,alpha = 0.5, fill = Country)) +
@@ -18,17 +52,7 @@ pointsmtkg <- ggplot(plastic, aes(x=Total_Plastic_Waste_MT, y=Per_Capita_Waste_K
   theme(legend.position = "none")
 ```
 
-```{r fig.height=100, fig.width=100}
+
+```{r, fig.height=16, fig.width=16}
 ggplotly(pointsmtkg)
-```
-
-```{r}
-boxplotmtkg <- ggplot(plastic, aes(x=Total_Plastic_Waste_MT, y=Per_Capita_Waste_KG, fill = Country)) +
-  geom_boxplot() +
-  theme(legend.position = "none")
-
-```
-
-```{r}
-ggplotly(boxplotmtkg)
 ```
