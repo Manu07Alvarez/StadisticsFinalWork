@@ -12,8 +12,7 @@ library(ggplot2)
 library(plotly)
 ```
 ```{r}
-model <- lm(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG + Recycling_Rate + 
-            Coastal_Waste_Risk + Main_Sources, data = plastic)
+model <- lm(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG + Recycling_Rate + Main_Sources, data = plastic)
 ```
 ```{r}
 summary(model)
@@ -35,13 +34,26 @@ par(mfrow = c(2,2))
 plot(model)
 ```
 ```{r}
-model_interaction <- lm(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG * 
-                       Recycling_Rate 
-                       * Main_Sources, 
+model_interaction <- lm(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG *
+                       Recycling_Rate * 
+                       Main_Sources * 
+                       Coastal_Waste_Risk, 
                        data = plastic)
+summary(model_interaction)
 ```
 ```{r}
-summary(model_interaction)
+anova(model_interaction)
+interact <- aov(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG *
+                       Recycling_Rate * 
+                       Main_Sources * 
+                       Coastal_Waste_Risk, 
+                       data = plastic)
+```
+
+```{r}
+library(agricolae)
+tukeysig <- TukeyHSD(interact,"Coastal_Waste_Risk")
+plot(tukeysig)
 ```
 
 
