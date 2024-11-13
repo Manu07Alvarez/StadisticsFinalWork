@@ -4,50 +4,27 @@ output: html_notebook
 ---
 
 ```{r}
-plastic <- read.csv("plastic.csv", stringsAsFactors = TRUE)
+plastic <- read.csv("Plastic Waste Around the World.csv", stringsAsFactors = TRUE)
 ```
+$$
+\text{La hipótesis nula a probar es:} \\
+H_0: \text{No existe una relación significativa entre la producción de residuos plásticos a nivel nacional y la tasa de reciclaje nacional.} \\
+
+$$
 
 ```{r}
 library(ggplot2)
 library(plotly)
-```
-```{r}
-model <- lm(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG + Recycling_Rate + Main_Sources, data = plastic)
-```
-```{r}
-summary(model)
-```
-
-```{r}
 library(car)
 ```
-```{r}
-Anova(model,type = "III")
-```
 
 ```{r}
-shapiro.test(residuals(model))
-```
-
-```{r, fig.height=6, fig.width=7}
-par(mfrow = c(2,2))
-plot(model)
-```
-```{r}
-model_interaction <- lm(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG *
-                       Recycling_Rate * 
-                       Main_Sources * 
-                       Coastal_Waste_Risk, 
-                       data = plastic)
-summary(model_interaction)
-```
-```{r}
-anova(model_interaction)
 interact <- aov(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG *
                        Recycling_Rate * 
                        Main_Sources * 
                        Coastal_Waste_Risk, 
                        data = plastic)
+summary(interact)
 ```
 
 ```{r}
