@@ -8,7 +8,8 @@ plastic <- read.csv("Plastic Waste Around the World.csv", stringsAsFactors = TRU
 ```
 $$
 \text{La hipótesis nula a probar es:} \\
-H_0: \text{No existe una relación significativa entre la producción de residuos plásticos a nivel nacional y la tasa de reciclaje nacional.} \\
+H_0: \text{No existe una relación significativa entre la producción de residuos plásticos a nivel nacional, la tasa de reciclaje,} \\  
+\text{la produccion de residuos per-capita, El tipo principal de resudio por pais y el riesgo de residuos costeros.} \\
 
 $$
 
@@ -16,32 +17,71 @@ $$
 library(ggplot2)
 library(plotly)
 library(car)
-```
-
-```{r}
-interact <- aov(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG *
-                       Recycling_Rate * 
+interact <- lm(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG *
+                       Recycling_Rate *
                        Main_Sources * 
                        Coastal_Waste_Risk, 
                        data = plastic)
 summary(interact)
 ```
 
+```{r, fig.width=10, fig.height=6}
+par(mfrow = c(2,2))
+plot(interact)
+```
+
+
+```{r}
+fig <- plot_ly(x = plastic$Recycling_Rate, 
+               y = plastic$Per_Capita_Waste_KG, 
+               z = plastic$Total_Plastic_Waste_MT, 
+               color = plastic$Main_Sources, 
+               type = "scatter3d", mode = "markers") 
+fig
+```
+```{r, fig.width=14, fig.height=4}
+library(ggeffects)
+
+# Obtener efectos marginales del modelo ajustado
+efectos_marginales <- ggpredict(interact, terms = c("Main_Sources","Recycling_Rate"))
+
+# Graficar los efectos marginales
+plot(efectos_marginales)
+```
+$$
+\text{Rechazamos la hipotesis nula : } H_0 \\
+\text{Al observar que existe una relacion significante entre las variables Recycling_Rate y Main_Sources}
+$$
+```{r}
+library(ggcorrplot)
+reduced_data <- subset(plastic, select = c(-Main_Sources, -Country, -Coastal_Waste_Risk))
+corr_matrix = round(cor(reduced_data), 2)
+ggcorrplot(corr_matrix, hc.order = TRUE, type = "lower",
+          lab = TRUE)
+```
+```{r}
+library(ggeffects)
+ggeffect(interact)
+```
+
+
+```{r}
+plot(plastic, pch = 16)
+abline(interact)
+```
+
+
 ```{r}
 library(agricolae)
-tukeysig <- TukeyHSD(interact,"Coastal_Waste_Risk")
+tukey <- aov(Total_Plastic_Waste_MT ~ Per_Capita_Waste_KG *
+                       Recycling_Rate *
+                       Main_Sources * 
+                       Coastal_Waste_Risk, 
+                       data = plastic)
+tukeysig <- TukeyHSD(tukey,"Coastal_Waste_Risk")
 plot(tukeysig)
 ```
-
-
-
-```{r}
-pointsmtkg <- ggplot(plastic, aes(x=Total_Plastic_Waste_MT, y=Per_Capita_Waste_KG,alpha = 0.5, fill = Country)) +
-  geom_point() +
-  theme(legend.position = "none")
-```
-
-
-```{r, fig.height=16, fig.width=16}
-ggplotly(pointsmtkg)
+```{r, fig.width=12, fig.height=8}
+tukeysig <- TukeyHSD(tukey,"Main_Sources")
+plot(tukeysig)
 ```
